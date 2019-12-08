@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Weather</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <!-- Don't forget to link to jQuery -->
+    <style>
+      input {
+        margin: 10px 0px;
+        padding: 5px;
+      }
+      #forecast {
+        /*This div should not appear until the weather is returned.*/
+      }
+      #forecast div {
+        width: 25vw;
+        border: 8px solid blue;
+        margin: 0 auto;
+        background: black;
+      }
+      img {
+        width: 100%;
+      }
+    </style>
+    <script>
+      function gettingJSON() {
+        try {
+          var app_id = "2d552b3866fae3a89dfbcce6f4652cd6";
+          var city = $("#location").val();
+          if (city == "") {
+            // city = $("#location").val("Ann Arbor");
+            city = "Ann Arbor";
+          }
+
+          // Use the OpenWeather API to return:
+          //  the current temperature
+          //  the high temperature for the day
+          //  the low temperature for the day
+          //  the icon for the current weather.
+
+          // You will need to update this query with the city, weather format (Celsius or Fahrenheit) and your OpenWeatherMap ID
+
+          // Right now I have it set to Chicago.  The default should be Ann Abor/Fahreheit.
+          let query =
+            "http://api.openweathermap.org/data/2.5/weather?q=" +
+            city +
+            "&APPID=" +
+            app_id;
+
+          console.log("Query is :" + query);
+
+          $.getJSON(query, function(json) {
+            console.log(JSON.stringify(json));
+            var icon1 = json.weather["0"].icon;
+            console.log(icon1);
+            var fcity = json.name;
+            var cur = json.main.temp;
+            var low = json.main.temp_min;
+            var high = json.main.temp_max;
+
+            let icons = "http://openweathermap.org/img/wn/" + icon1 + ".png";
+            $("#tempImg").attr("src", icons);
+
+            var fcur = farconvert(cur);
+            var fhigh = farconvert(high);
+            var flow = farconvert(low);
+            $("#fahrenheit").prop("checked", true);
+            $("#loc").text(fcity);
+            $("#temp").text(fcur);
+            $("#high").text(fhigh);
+            $("#low").text(flow);
+
+            $("#fahrenheit").click(function() {
+              $("#fahrenheit").prop("checked", true);
+              fcur = farconvert(cur);
+              fhigh = farconvert(high);
+              flow = farconvert(low);
+              $("#loc").text(fcity);
+              $("#temp").text(fcur);
+              $("#high").text(fhigh);
+              $("#low").text(flow);
+            });
+            $("#celcius").click(function() {
+              $("#celcius").prop("checked", true);
+              var ccur = celconvert(cur);
+              var chigh = celconvert(high);
+              var clow = celconvert(low);
+              $("#loc").text(fcity);
+              $("#temp").text(ccur);
+              $("#high").text(chigh);
+              $("#low").text(clow);
+            });
+          });
+        } catch (err) {
+          alert("this did not work");
+          $("#forecast").css("display", "none");
+        }
+        function farconvert(x) {
+          return (x - 273.15) * (9 / 5) + 32;
+        }
+        function celconvert(y) {
+          return y - 273.15;
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <!-- DO NOT CHANGE ANY CODE IN THE BODY OF THIS FILE. -->
+    <label for="location">City:</label><input type="text" id="location" /><br />
+    <input type="radio" name="temp" value="imperial" id="fahrenheit" />
+    <label for="fahrenheit">Fahrenheit</label><br />
+    <input type="radio" name="temp" value="metric" id="celcius" />
+    <label for="celcius">Celcius</label><br />
+
+    <button id="getIt" onclick=" gettingJSON()">Get Weather</button>
+
+    <div id="forecast">
+      <div>
+        <img id="tempImg" src="" alt="" title="" />
+      </div>
+      <p>
+        The temperature in <span id="loc"></span> is currently
+        <span id="temp"></span>.
+      </p>
+      <p>
+        The high today will be <span id="high"></span> and the low will be
+        <span id="low"></span>.
+      </p>
+    </div>
+  </body>
+</html>
