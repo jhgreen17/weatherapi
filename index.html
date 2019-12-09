@@ -26,7 +26,6 @@
     </style>
     <script>
       function gettingJSON() {
-        $("#forecast").css("display", "block");
         var app_id = "2d552b3866fae3a89dfbcce6f4652cd6";
         var city = $("#location").val();
 
@@ -60,6 +59,7 @@
         console.log("Query is :" + query);
 
         $.getJSON(query, function(json) {
+          $("#forecast").css("display", "block");
           console.log(JSON.stringify(json));
           var icon1 = json.weather["0"].icon;
           var fcity = json.name;
@@ -75,7 +75,17 @@
           $("#temp").text(cur);
           $("#high").text(high);
           $("#low").text(low);
-        });
+        })
+          .done(function() {
+            console.log("second success");
+          })
+          .fail(function() {
+            alert("you must enter a valid city");
+            $("#forecast").css("display", "none");
+          })
+          .always(function() {
+            console.log("complete");
+          });
       }
     </script>
   </head>
