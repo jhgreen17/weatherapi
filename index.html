@@ -11,6 +11,7 @@
         padding: 5px;
       }
       #forecast {
+        display: none;
         /*This div should not appear until the weather is returned.*/
       }
       #forecast div {
@@ -25,83 +26,56 @@
     </style>
     <script>
       function gettingJSON() {
-        try {
-          var app_id = "2d552b3866fae3a89dfbcce6f4652cd6";
-          var city = $("#location").val();
-          if (city == "") {
-            // city = $("#location").val("Ann Arbor");
-            city = "Ann Arbor";
-          }
+        $("#forecast").css("display", "block");
+        var app_id = "2d552b3866fae3a89dfbcce6f4652cd6";
+        var city = $("#location").val();
 
-          // Use the OpenWeather API to return:
-          //  the current temperature
-          //  the high temperature for the day
-          //  the low temperature for the day
-          //  the icon for the current weather.
-
-          // You will need to update this query with the city, weather format (Celsius or Fahrenheit) and your OpenWeatherMap ID
-
-          // Right now I have it set to Chicago.  The default should be Ann Abor/Fahreheit.
-          let query =
-            "http://api.openweathermap.org/data/2.5/weather?q=" +
-            city +
-            "&APPID=" +
-            app_id;
-
-          console.log("Query is :" + query);
-
-          $.getJSON(query, function(json) {
-            console.log(JSON.stringify(json));
-            var icon1 = json.weather["0"].icon;
-            console.log(icon1);
-            var fcity = json.name;
-            var cur = json.main.temp;
-            var low = json.main.temp_min;
-            var high = json.main.temp_max;
-
-            let icons = "http://openweathermap.org/img/wn/" + icon1 + ".png";
-            $("#tempImg").attr("src", icons);
-
-            var fcur = farconvert(cur);
-            var fhigh = farconvert(high);
-            var flow = farconvert(low);
-            $("#fahrenheit").prop("checked", true);
-            $("#loc").text(fcity);
-            $("#temp").text(fcur);
-            $("#high").text(fhigh);
-            $("#low").text(flow);
-
-            $("#fahrenheit").click(function() {
-              $("#fahrenheit").prop("checked", true);
-              fcur = farconvert(cur);
-              fhigh = farconvert(high);
-              flow = farconvert(low);
-              $("#loc").text(fcity);
-              $("#temp").text(fcur);
-              $("#high").text(fhigh);
-              $("#low").text(flow);
-            });
-            $("#celcius").click(function() {
-              $("#celcius").prop("checked", true);
-              var ccur = celconvert(cur);
-              var chigh = celconvert(high);
-              var clow = celconvert(low);
-              $("#loc").text(fcity);
-              $("#temp").text(ccur);
-              $("#high").text(chigh);
-              $("#low").text(clow);
-            });
-          });
-        } catch (err) {
-          alert("this did not work");
-          $("#forecast").css("display", "none");
+        if (city == "") {
+          city = "Ann Arbor";
+          $("#location").val("Ann Arbor");
         }
-        function farconvert(x) {
-          return (x - 273.15) * (9 / 5) + 32;
+        var units = $("input[name='temp']:checked").val();
+        if (units == undefined) {
+          $("#fahrenheit").prop("checked", true);
+          units = "imperial";
         }
-        function celconvert(y) {
-          return y - 273.15;
-        }
+
+        // Use the OpenWeather API to return:
+        //  the current temperature
+        //  the high temperature for the day
+        //  the low temperature for the day
+        //  the icon for the current weather.
+
+        // You will need to update this query with the city, weather format (Celsius or Fahrenheit) and your OpenWeatherMap ID
+
+        // Right now I have it set to Chicago.  The default should be Ann Abor/Fahreheit.
+        let query =
+          "https://api.openweathermap.org/data/2.5/weather?q=" +
+          city +
+          "&units=" +
+          units +
+          "&APPID=" +
+          app_id;
+
+        console.log("Query is :" + query);
+
+        $.getJSON(query, function(json) {
+          console.log(JSON.stringify(json));
+          var icon1 = json.weather["0"].icon;
+          var fcity = json.name;
+          var cur = json.main.temp;
+          var low = json.main.temp_min;
+          var high = json.main.temp_max;
+
+          let icons = "https://openweathermap.org/img/wn/" + icon1 + ".png";
+          $("#tempImg").attr("src", icons);
+          $("input[name='temp']:checked").val();
+
+          $("#loc").text(fcity);
+          $("#temp").text(cur);
+          $("#high").text(high);
+          $("#low").text(low);
+        });
       }
     </script>
   </head>
